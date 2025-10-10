@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SFTP File Transfer Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #1a1a2e, #16213e, #0f3460);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 30px;
+      margin-top: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      width: 90%;
+      max-width: 1000px;
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      text-align: center;
+      color: #fddb3a;
+      margin-bottom: 25px;
+    }
+
+    label {
+      color: #fddb3a;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+      background: #fddb3a;
+      border: none;
+      color: #000;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    input:focus {
+      outline: 2px solid #fddb3a;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background-color: #fddb3a;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #fff;
+      color: #000;
+      transform: scale(1.03);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    th {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fddb3a;
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: #fddb3a;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      color: #fff;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #fff;
+      opacity: 0.8;
+      font-size: 0.9rem;
+    }
+
+    /* Loading overlay */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 9999;
+    }
+
+    .overlay.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .spinner {
+      border: 6px solid rgba(255, 255, 255, 0.2);
+      border-top: 6px solid #fddb3a;
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      color: #fddb3a;
+      text-shadow: 0 0 5px #000;
+      font-weight: bold;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Processing... Please wait</div>
+  </div>
+
+  <div class="container">
+    <h2><i class="fa-solid fa-cloud-arrow-up"></i> Secure SFTP File Transfer</h2>
+
+    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+      <label>Host</label>
+      <input type="text" name="host" placeholder="Enter host (e.g. 192.168.1.10)" required value="{{ host or '' }}">
+
+      <label>Username</label>
+      <input type="text" name="username" placeholder="Enter username" required value="{{ username or '' }}">
+
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Enter password" required value="{{ password or '' }}">
+
+      <label>Select File</label>
+      <input type="file" name="file" required>
+
+      <button type="button" class="btn" id="uploadButton">
+        <i class="fa-solid fa-upload"></i> Upload File
+      </button>
+    </form>
+
+    {% if files %}
+    <table>
+      <thead>
+        <tr>
+          <th>File Name</th>
+          <th>Download</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for file in files %}
+        <tr>
+          <td>{{ file }}</td>
+          <td>
+            <form action="/download" method="POST" class="action-form">
+              <input type="hidden" name="host" value="{{ host }}">
+              <input type="hidden" name="username" value="{{ username }}">
+              <input type="hidden" name="password" value="{{ password }}">
+              <input type="hidden" name="filename" value="{{ file }}">
+              <button type="submit" class="icon-btn"><i class="fa-solid fa-download"></i></button>
+            </form>
+          </td>
+          <td>
+            <form action="/delete" method="POST" class="action-form">
+              <input type="hidden" name="host" value="{{ host }}">
+              <input type="hidden" name="username" value="{{ username }}">
+              <input type="hidden" name="password" value="{{ password }}">
+              <input type="hidden" name="filename" value="{{ file }}">
+              <button type="submit" class="icon-btn"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+
+  <footer>
+    <p>🔒 Secure File Transfer using SFTP | Developed by Anurag</p>
+  </footer>
+
+  <script>
+    const overlay = document.getElementById('loadingOverlay');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadButton = document.getElementById('uploadButton');
+
+    // Prevent Enter key from submitting the form
+    uploadForm.addEventListener('keydown', function(e) {
+      if (e.key === "Enter") e.preventDefault();
+    });
+
+    // Submit only when button is clicked
+    uploadButton.addEventListener('click', function() {
+      overlay.classList.add('active');
+      uploadForm.submit();
+    });
+
+    window.addEventListener('load', () => {
+      overlay.classList.remove('active');
+    });
+
+    // SweetAlert for Flask flash messages
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: '{{ message }}',
+              confirmButtonColor: '#fddb3a',
+              background: '#16213e',
+              color: '#fff'
+            });
+          {% elif category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Operation Failed!',
+              text: '{{ message }}',
+              confirmButtonColor: '#fddb3a',
+              background: '#16213e',
+              color: '#fff'
+            });
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </script>
+
+</body>
+</html>
