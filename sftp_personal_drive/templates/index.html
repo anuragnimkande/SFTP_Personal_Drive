@@ -1,302 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>SFTP File Transfer Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
-  <!-- SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Drive | Secure SFTP Storage</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(120deg, #1a1a2e, #16213e, #0f3460);
-      color: #fff;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #0b1121, #16213e);
+        color: #e0e6f0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
 
-    .container {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 30px;
-      margin-top: 40px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-      width: 90%;
-      max-width: 1000px;
-      backdrop-filter: blur(10px);
-    }
+      .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 90%;
+        max-width: 1200px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 50px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      }
 
-    h2 {
-      text-align: center;
-      color: #fddb3a;
-      margin-bottom: 25px;
-    }
+      /* -------- LEFT SIDE -------- */
+      .info {
+        flex: 1;
+        padding-right: 40px;
+      }
 
-    label {
-      color: #fddb3a;
-      font-weight: 600;
-    }
+      .info h1 {
+        font-size: 2.4rem;
+        color: #f9d71c;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-    input[type="text"],
-    input[type="password"],
-    input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-    }
+      .info p {
+        color: #c4c8da;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        max-width: 500px;
+      }
 
-    input[type="file"]::-webkit-file-upload-button {
-      background: #fddb3a;
-      border: none;
-      color: #000;
-      border-radius: 8px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
+      .btn {
+        background: #f9d71c;
+        color: #000;
+        border: none;
+        padding: 14px 38px;
+        border-radius: 40px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: 0.3s ease;
+        box-shadow: 0 0 10px rgba(249, 215, 28, 0.4);
+        text-decoration: none;
+        display: inline-block;
+      }
 
-    input:focus {
-      outline: 2px solid #fddb3a;
-    }
+      .btn:hover {
+        background: #ffe34b;
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px rgba(249, 215, 28, 0.6);
+      }
 
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background-color: #fddb3a;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
+      /* -------- RIGHT SIDE -------- */
+      .visual {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
 
-    .btn:hover {
-      background-color: #fff;
-      color: #000;
-      transform: scale(1.03);
-    }
+      .visual img {
+        width: 300px;
+        margin-bottom: 30px;
+        filter: drop-shadow(0 0 20px rgba(249, 215, 28, 0.3));
+      }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 25px;
-    }
+      .features {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+      }
 
-    th,
-    td {
-      padding: 10px;
-      text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
+      .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: center;
+        width: 130px;
+        transition: 0.3s ease;
+      }
 
-    th {
-      background-color: rgba(255, 255, 255, 0.15);
-      color: #fddb3a;
-    }
+      .feature-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-5px);
+        border-color: rgba(249, 215, 28, 0.3);
+      }
 
-    tr:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
+      .feature-card i {
+        font-size: 1.6rem;
+        color: #f9d71c;
+        margin-bottom: 8px;
+      }
 
-    .icon-btn {
-      background: transparent;
-      border: none;
-      color: #fddb3a;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
+      .feature-card p {
+        font-size: 0.9rem;
+        color: #c4c8da;
+      }
 
-    .icon-btn:hover {
-      color: #fff;
-    }
+      /* -------- FOOTER -------- */
+      footer {
+        margin-top: 40px;
+        text-align: center;
+        width: 100%;
+        color: #94a0c1;
+        font-size: 0.85rem;
+      }
 
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      color: #fff;
-      opacity: 0.8;
-      font-size: 0.9rem;
-    }
+      footer i {
+        color: #f9d71c;
+        margin-right: 5px;
+      }
 
-    /* Loading overlay */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 9999;
-    }
+      @media (max-width: 900px) {
+        .container {
+          flex-direction: column;
+          text-align: center;
+          padding: 40px 30px;
+        }
 
-    .overlay.active {
-      display: flex;
-      animation: fadeIn 0.3s ease;
-    }
+        .info {
+          padding-right: 0;
+          margin-bottom: 30px;
+        }
 
-    .spinner {
-      border: 6px solid rgba(255, 255, 255, 0.2);
-      border-top: 6px solid #fddb3a;
-      border-radius: 50%;
-      width: 70px;
-      height: 70px;
-      animation: spin 1s linear infinite;
-    }
+        .visual img {
+          width: 220px;
+        }
 
-    .loading-text {
-      margin-top: 15px;
-      font-size: 1.1rem;
-      color: #fddb3a;
-      text-shadow: 0 0 5px #000;
-      font-weight: bold;
-    }
+        .features {
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Left section -->
+      <div class="info">
+        <h1><i class="fa-solid fa-network-wired"></i> Personal Drive</h1>
+        <p>
+          Your private and secure SFTP-based storage system. Upload, download,
+          and manage your personal or professional files with complete
+          encryption and network-grade reliability.
+        </p>
+        <a href="/sftp" class="btn">Access Drive</a>
+      </div>
 
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+      <!-- Right section -->
+      <div class="visual">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2933/2933245.png"
+          alt="Network Drive"
+        />
+        <div class="features">
+          <div class="feature-card">
+            <i class="fa-solid fa-lock"></i>
+            <p>Encrypted</p>
+          </div>
+          <div class="feature-card">
+            <i class="fa-solid fa-cloud-upload-alt"></i>
+            <p>Upload</p>
+          </div>
+          <div class="feature-card">
+            <i class="fa-solid fa-download"></i>
+            <p>Download</p>
+          </div>
+          <div class="feature-card">
+            <i class="fa-solid fa-shield-halved"></i>
+            <p>Secure</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="overlay" id="loadingOverlay">
-    <div class="spinner"></div>
-    <div class="loading-text">Processing... Please wait</div>
-  </div>
-
-  <div class="container">
-    <h2><i class="fa-solid fa-cloud-arrow-up"></i> Secure SFTP File Transfer</h2>
-
-    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
-      <label>Host</label>
-      <input type="text" name="host" placeholder="Enter host (e.g. 192.168.1.10)" required value="{{ host or '' }}">
-
-      <label>Username</label>
-      <input type="text" name="username" placeholder="Enter username" required value="{{ username or '' }}">
-
-      <label>Password</label>
-      <input type="password" name="password" placeholder="Enter password" required value="{{ password or '' }}">
-
-      <label>Select File</label>
-      <input type="file" name="file" required>
-
-      <button type="button" class="btn" id="uploadButton">
-        <i class="fa-solid fa-upload"></i> Upload File
-      </button>
-    </form>
-
-    {% if files %}
-    <table>
-      <thead>
-        <tr>
-          <th>File Name</th>
-          <th>Download</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for file in files %}
-        <tr>
-          <td>{{ file }}</td>
-          <td>
-            <form action="/download" method="POST" class="action-form">
-              <input type="hidden" name="host" value="{{ host }}">
-              <input type="hidden" name="username" value="{{ username }}">
-              <input type="hidden" name="password" value="{{ password }}">
-              <input type="hidden" name="filename" value="{{ file }}">
-              <button type="submit" class="icon-btn"><i class="fa-solid fa-download"></i></button>
-            </form>
-          </td>
-          <td>
-            <form action="/delete" method="POST" class="action-form">
-              <input type="hidden" name="host" value="{{ host }}">
-              <input type="hidden" name="username" value="{{ username }}">
-              <input type="hidden" name="password" value="{{ password }}">
-              <input type="hidden" name="filename" value="{{ file }}">
-              <button type="submit" class="icon-btn"><i class="fa-solid fa-trash"></i></button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% endif %}
-  </div>
-
-  <footer>
-    <p>🔒 Secure File Transfer using SFTP | Developed by Anurag</p>
-  </footer>
-
-  <script>
-    const overlay = document.getElementById('loadingOverlay');
-    const uploadForm = document.getElementById('uploadForm');
-    const uploadButton = document.getElementById('uploadButton');
-
-    // Prevent Enter key from submitting the form
-    uploadForm.addEventListener('keydown', function(e) {
-      if (e.key === "Enter") e.preventDefault();
-    });
-
-    // Submit only when button is clicked
-    uploadButton.addEventListener('click', function() {
-      overlay.classList.add('active');
-      uploadForm.submit();
-    });
-
-    window.addEventListener('load', () => {
-      overlay.classList.remove('active');
-    });
-
-    // SweetAlert for Flask flash messages
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          {% if category == 'success' %}
-            Swal.fire({
-              icon: 'success',
-              title: 'Success!',
-              text: '{{ message }}',
-              confirmButtonColor: '#fddb3a',
-              background: '#16213e',
-              color: '#fff'
-            });
-          {% elif category == 'error' %}
-            Swal.fire({
-              icon: 'error',
-              title: 'Operation Failed!',
-              text: '{{ message }}',
-              confirmButtonColor: '#fddb3a',
-              background: '#16213e',
-              color: '#fff'
-            });
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  </script>
-
-</body>
+    <footer>
+      <i class="fa-solid fa-lock"></i> Secure File Transfer via SFTP | Developed
+      by <strong>Anurag</strong>
+    </footer>
+  </body>
 </html>

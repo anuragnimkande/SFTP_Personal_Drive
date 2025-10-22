@@ -7,9 +7,10 @@ def get_sftp_connection(host, username, password):
 
 
 def list_files(sftp, username):
-    remote_path = f"/home/{username}/uploads"
+    remote_dir = f"/home/{username}/uploads"
     try:
-        return sftp.listdir(remote_path)
-    except FileNotFoundError:
-        sftp.mkdir(remote_path)
+        sftp.chdir(remote_dir)
+    except IOError:
         return []
+    return sftp.listdir()
+

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SFTP File Transfer Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #0b1121, #16213e);
+        color: #e0e6f0;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 40px;
+        margin-top: 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        width: 90%;
+        max-width: 1000px;
+        backdrop-filter: blur(10px);
+      }
+      h2 {
+        text-align: center;
+        color: #f9d71c;
+        margin-bottom: 30px;
+        font-size: 2rem;
+      }
+      label {
+        color: #f9d71c;
+        font-weight: 600;
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 5px;
+      }
+      input[type="text"],
+      input[type="password"],
+      input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #e0e6f0;
+        font-size: 1rem;
+      }
+      input[type="file"]::-webkit-file-upload-button {
+        background: #f9d71c;
+        border: none;
+        color: #000;
+        border-radius: 8px;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      input:focus {
+        outline: 2px solid #f9d71c;
+      }
+      .btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 40px;
+        background: #f9d71c;
+        color: #000;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: 0.3s ease;
+        box-shadow: 0 0 10px rgba(249, 215, 28, 0.4);
+      }
+      .btn:hover {
+        background: #ffe34b;
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(249, 215, 28, 0.6);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      th {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #f9d71c;
+        font-weight: 600;
+      }
+      tr:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+      .icon-btn {
+        background: transparent;
+        border: none;
+        color: #f9d71c;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+      .icon-btn:hover {
+        color: #ffe34b;
+      }
+      footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #94a0c1;
+        font-size: 0.85rem;
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 9999;
+      }
+      .overlay.active {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+      }
+      .spinner {
+        border: 6px solid rgba(255, 255, 255, 0.2);
+        border-top: 6px solid #f9d71c;
+        border-radius: 50%;
+        width: 70px;
+        height: 70px;
+        animation: spin 1s linear infinite;
+      }
+      .loading-text {
+        margin-top: 15px;
+        font-size: 1.1rem;
+        color: #f9d71c;
+        font-weight: bold;
+        text-shadow: 0 0 5px #000;
+      }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @media (max-width: 600px) {
+        .container {
+          padding: 30px 20px;
+        }
+        th,
+        td {
+          font-size: 0.9rem;
+        }
+        .btn {
+          font-size: 0.95rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <div class="loading-text">Processing... Please wait</div>
+    </div>
+
+    <div class="container">
+      <h2>
+        <i class="fa-solid fa-cloud-arrow-up"></i> Secure SFTP File Transfer
+      </h2>
+
+      <!-- Step 1: Credential Form -->
+      {% if not host or not username or not password %}
+      <form id="credentialForm" method="POST" action="/sftp_access">
+        <label>Host (IP Address)</label>
+        <input type="text" name="host" placeholder="Enter host" required />
+
+        <label>Username</label>
+        <input
+          type="text"
+          name="username"
+          placeholder="Enter username"
+          required
+        />
+
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter password"
+          required
+        />
+
+        <button type="submit" class="btn">
+          <i class="fa-solid fa-right-to-bracket"></i> Connect
+        </button>
+      </form>
+      {% else %}
+      <!-- Step 2: Upload/Download Interface -->
+      <form
+        id="uploadForm"
+        action="/upload"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <input type="hidden" name="host" value="{{ host }}" />
+        <input type="hidden" name="username" value="{{ username }}" />
+        <input type="hidden" name="password" value="{{ password }}" />
+
+        <label>Select File</label>
+        <input type="file" name="file" required />
+
+        <button type="button" class="btn" id="uploadButton">
+          <i class="fa-solid fa-upload"></i> Upload File
+        </button>
+      </form>
+
+      {% if files %}
+      <table>
+        <thead>
+          <tr>
+            <th>File Name</th>
+            <th>Download</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for file in files %}
+          <tr>
+            <td>{{ file }}</td>
+            <td>
+              <form action="/download" method="POST" class="action-form">
+                <input type="hidden" name="host" value="{{ host }}" />
+                <input type="hidden" name="username" value="{{ username }}" />
+                <input type="hidden" name="password" value="{{ password }}" />
+                <input type="hidden" name="filename" value="{{ file }}" />
+                <button type="submit" class="icon-btn">
+                  <i class="fa-solid fa-download"></i>
+                </button>
+              </form>
+            </td>
+            <td>
+              <form action="/delete" method="POST" class="action-form">
+                <input type="hidden" name="host" value="{{ host }}" />
+                <input type="hidden" name="username" value="{{ username }}" />
+                <input type="hidden" name="password" value="{{ password }}" />
+                <input type="hidden" name="filename" value="{{ file }}" />
+                <button type="submit" class="icon-btn">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %} {% endif %}
+    </div>
+
+    <footer>
+      <p>🔒 Secure File Transfer via SFTP | Developed by Anurag</p>
+    </footer>
+
+    <script>
+      const overlay = document.getElementById('loadingOverlay');
+      const uploadForm = document.getElementById('uploadForm');
+      const uploadButton = document.getElementById('uploadButton');
+
+      if(uploadForm && uploadButton){
+        uploadButton.addEventListener('click', function() {
+          overlay.classList.add('active');
+          uploadForm.submit();
+        });
+      }
+
+      window.addEventListener('load', () => {
+        overlay.classList.remove('active');
+      });
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            Swal.fire({
+              icon: '{{ "success" if category=="success" else "error" }}',
+              title: '{{ "Success!" if category=="success" else "Operation Failed!" }}',
+              text: '{{ message }}',
+              confirmButtonColor: '#f9d71c',
+              background: '#16213e',
+              color: '#fff'
+            });
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </script>
+  </body>
+</html>
