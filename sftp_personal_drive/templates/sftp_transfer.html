@@ -200,7 +200,6 @@
       <form id="credentialForm" method="POST" action="/sftp_access">
         <label>Host (IP Address)</label>
         <input type="text" name="host" placeholder="Enter host" required />
-
         <label>Username</label>
         <input
           type="text"
@@ -208,7 +207,6 @@
           placeholder="Enter username"
           required
         />
-
         <label>Password</label>
         <input
           type="password"
@@ -216,71 +214,101 @@
           placeholder="Enter password"
           required
         />
-
         <button type="submit" class="btn">
           <i class="fa-solid fa-right-to-bracket"></i> Connect
         </button>
       </form>
       {% else %}
-      <!-- Step 2: Upload/Download Interface -->
-      <form
-        id="uploadForm"
-        action="/upload"
-        method="POST"
-        enctype="multipart/form-data"
-      >
-        <input type="hidden" name="host" value="{{ host }}" />
-        <input type="hidden" name="username" value="{{ username }}" />
-        <input type="hidden" name="password" value="{{ password }}" />
+      <!-- Step 2: Advanced Upload/Download Interface -->
+      <div id="dashboard">
+        <form
+          id="uploadForm"
+          action="/upload"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <input type="hidden" name="host" value="{{ host }}" />
+          <input type="hidden" name="username" value="{{ username }}" />
+          <input type="hidden" name="password" value="{{ password }}" />
 
-        <label>Select File</label>
-        <input type="file" name="file" required />
+          <label>Select File</label>
+          <input type="file" name="file" id="fileInput" required />
 
-        <button type="button" class="btn" id="uploadButton">
-          <i class="fa-solid fa-upload"></i> Upload File
-        </button>
-      </form>
+          <!-- File preview -->
+          <div id="filePreview" style="margin-top: 15px; display: none">
+            <p><strong>Preview:</strong></p>
+            <div
+              id="previewContent"
+              style="
+                border: 1px solid rgba(249, 215, 28, 0.5);
+                padding: 10px;
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.05);
+                color: #fff;
+              "
+            ></div>
+          </div>
 
-      {% if files %}
-      <table>
-        <thead>
-          <tr>
-            <th>File Name</th>
-            <th>Download</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for file in files %}
-          <tr>
-            <td>{{ file }}</td>
-            <td>
-              <form action="/download" method="POST" class="action-form">
-                <input type="hidden" name="host" value="{{ host }}" />
-                <input type="hidden" name="username" value="{{ username }}" />
-                <input type="hidden" name="password" value="{{ password }}" />
-                <input type="hidden" name="filename" value="{{ file }}" />
-                <button type="submit" class="icon-btn">
-                  <i class="fa-solid fa-download"></i>
+          <button type="button" class="btn" id="uploadButton">
+            <i class="fa-solid fa-upload"></i> Upload File
+          </button>
+        </form>
+
+        {% if files %}
+        <table>
+          <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Preview</th>
+              <th>Download</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for file in files %}
+            <tr>
+              <td>{{ file }}</td>
+              <td>
+                <button
+                  type="button"
+                  class="icon-btn preview-btn"
+                  data-filename="{{ file }}"
+                  data-host="{{ host }}"
+                  data-username="{{ username }}"
+                  data-password="{{ password }}"
+                >
+                  <i class="fa-solid fa-eye"></i>
                 </button>
-              </form>
-            </td>
-            <td>
-              <form action="/delete" method="POST" class="action-form">
-                <input type="hidden" name="host" value="{{ host }}" />
-                <input type="hidden" name="username" value="{{ username }}" />
-                <input type="hidden" name="password" value="{{ password }}" />
-                <input type="hidden" name="filename" value="{{ file }}" />
-                <button type="submit" class="icon-btn">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% endif %} {% endif %}
+              </td>
+              <td>
+                <form action="/download" method="POST">
+                  <input type="hidden" name="host" value="{{ host }}" />
+                  <input type="hidden" name="username" value="{{ username }}" />
+                  <input type="hidden" name="password" value="{{ password }}" />
+                  <input type="hidden" name="filename" value="{{ file }}" />
+                  <button type="submit" class="icon-btn">
+                    <i class="fa-solid fa-download"></i>
+                  </button>
+                </form>
+              </td>
+              <td>
+                <form action="/delete" method="POST">
+                  <input type="hidden" name="host" value="{{ host }}" />
+                  <input type="hidden" name="username" value="{{ username }}" />
+                  <input type="hidden" name="password" value="{{ password }}" />
+                  <input type="hidden" name="filename" value="{{ file }}" />
+                  <button type="submit" class="icon-btn">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
 
     <footer>
@@ -288,35 +316,78 @@
     </footer>
 
     <script>
-      const overlay = document.getElementById('loadingOverlay');
-      const uploadForm = document.getElementById('uploadForm');
-      const uploadButton = document.getElementById('uploadButton');
+      const overlay = document.getElementById("loadingOverlay");
+      const uploadForm = document.getElementById("uploadForm");
+      const uploadButton = document.getElementById("uploadButton");
+      const fileInput = document.getElementById("fileInput");
+      const filePreviewDiv = document.getElementById("filePreview");
+      const previewContent = document.getElementById("previewContent");
 
-      if(uploadForm && uploadButton){
-        uploadButton.addEventListener('click', function() {
-          overlay.classList.add('active');
+      // Upload
+      if (uploadForm && uploadButton) {
+        uploadButton.addEventListener("click", function () {
+          overlay.classList.add("active");
           uploadForm.submit();
         });
       }
 
-      window.addEventListener('load', () => {
-        overlay.classList.remove('active');
+      // Preview new files before upload
+      if (fileInput) {
+        fileInput.addEventListener("change", function () {
+          const file = fileInput.files[0];
+          if (!file) return;
+          filePreviewDiv.style.display = "block";
+          previewContent.innerHTML = "";
+
+          const reader = new FileReader();
+          const name = file.name.toLowerCase();
+
+          if (name.match(/\.(jpg|jpeg|png|gif|bmp)$/)) {
+            reader.onload = (e) =>
+              (previewContent.innerHTML = `<img src="${e.target.result}" style="max-width:100%; max-height:200px; border-radius:8px;">`);
+            reader.readAsDataURL(file);
+          } else if (name.endsWith(".pdf")) {
+            reader.onload = (e) =>
+              (previewContent.innerHTML = `<iframe src="${e.target.result}" style="width:100%;height:200px;border:none;"></iframe>`);
+            reader.readAsDataURL(file);
+          } else if (name.match(/\.(txt|csv|json|log|py|html|js)$/)) {
+            reader.onload = (e) =>
+              (previewContent.innerHTML = `<pre style="white-space:pre-wrap;">${e.target.result}</pre>`);
+            reader.readAsText(file);
+          } else {
+            previewContent.innerHTML =
+              "<p>Preview not available for this file type.</p>";
+          }
+        });
+      }
+
+      // Preview existing files from server
+      document.querySelectorAll(".preview-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const filename = btn.dataset.filename.trim();
+          const host = btn.dataset.host.trim();
+          const username = btn.dataset.username.trim();
+          const password = btn.dataset.password.trim();
+
+          Swal.fire({
+            title: filename,
+            html: `<iframe src="/download_preview?filename=${encodeURIComponent(
+              filename
+            )}&host=${encodeURIComponent(host)}&username=${encodeURIComponent(
+              username
+            )}&password=${encodeURIComponent(
+              password
+            )}" style="width:100%;height:300px;border:none;"></iframe>`,
+            width: "600px",
+            showCloseButton: true,
+            showConfirmButton: false,
+            background: "#16213e",
+            color: "#fff",
+          });
+        });
       });
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-            Swal.fire({
-              icon: '{{ "success" if category=="success" else "error" }}',
-              title: '{{ "Success!" if category=="success" else "Operation Failed!" }}',
-              text: '{{ message }}',
-              confirmButtonColor: '#f9d71c',
-              background: '#16213e',
-              color: '#fff'
-            });
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
+      window.addEventListener("load", () => overlay.classList.remove("active"));
     </script>
   </body>
 </html>

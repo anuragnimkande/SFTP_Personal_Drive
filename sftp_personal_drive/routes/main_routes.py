@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, send_file, flash, redirect, url_for
+import tempfile
+from flask import Blueprint, abort, render_template, request, send_file, flash, redirect, url_for
 from utils.sftp_utils import get_sftp_connection, list_files
 import os
 import io
@@ -7,6 +8,9 @@ main_bp = Blueprint("main", __name__, template_folder="../templates")
 
 LOCAL_UPLOAD_FOLDER = "uploads"
 os.makedirs(LOCAL_UPLOAD_FOLDER, exist_ok=True)
+
+TEMP_PREVIEW_DIR = os.path.join(tempfile.gettempdir(), "sftp_previews")
+os.makedirs(TEMP_PREVIEW_DIR, exist_ok=True)
 
 # Home page
 @main_bp.route("/", methods=["GET"])
@@ -80,7 +84,46 @@ def upload():
         username=username,
         password=password
     )
-    
+
+@main_bp.route("/download_preview")
+def download_preview():
+    # Strip all parameters to remove extra spaces
+    filename = request.args.get("filename", "").strip()
+    host = request.args.get("host", "").strip()
+    username = request.args.get("username", "").strip()
+    password = request.args.get("password", "").strip()
+
+    if not all([filename, host, username, password]):
+        return abort(400, description="Missing parameters")
+
+    try:
+        sftp, transport = get_sftp_connection(host, username, password)
+        remote_path = f"/home/{username}/uploads/{filename}"
+
+        # Use temporary file to preview
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        sftp.get(remote_path, temp_file.name)
+        sftp.close()
+        transport.close()
+
+        # Determine mime type
+        ext = filename.split('.')[-1].lower()
+        if ext in ["jpg", "jpeg", "png", "gif", "bmp"]:
+            mimetype = f"image/{ext}"
+        elif ext == "pdf":
+            mimetype = "application/pdf"
+        elif ext in ["txt", "csv", "log", "py", "json", "html", "js"]:
+            mimetype = "text/plain"
+        else:
+            mimetype = "application/octet-stream"
+
+        return send_file(temp_file.name, mimetype=mimetype, download_name=filename)
+
+    except FileNotFoundError:
+        return abort(404, description="File not found on SFTP server")
+    except Exception as e:
+        return abort(500, description=f"Error: {str(e)}")    
+
 @main_bp.route("/sftp_access", methods=["POST"])
 def sftp_access():
     host = request.form.get("host")
