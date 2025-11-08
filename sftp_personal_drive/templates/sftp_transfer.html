@@ -195,7 +195,6 @@
         <i class="fa-solid fa-cloud-arrow-up"></i> Secure SFTP File Transfer
       </h2>
 
-      <!-- Step 1: Credential Form -->
       {% if not host or not username or not password %}
       <form id="credentialForm" method="POST" action="/sftp_access">
         <label>Host (IP Address)</label>
@@ -219,7 +218,6 @@
         </button>
       </form>
       {% else %}
-      <!-- Step 2: Advanced Upload/Download Interface -->
       <div id="dashboard">
         <form
           id="uploadForm"
@@ -234,7 +232,6 @@
           <label>Select File</label>
           <input type="file" name="file" id="fileInput" required />
 
-          <!-- File preview -->
           <div id="filePreview" style="margin-top: 15px; display: none">
             <p><strong>Preview:</strong></p>
             <div
@@ -312,7 +309,7 @@
     </div>
 
     <footer>
-      <p>🔒 Secure File Transfer via SFTP | Developed by Anurag</p>
+      <p>🔒 Secure File Transfer via SFTP | Developed by Alchemists</p>
     </footer>
 
     <script>
@@ -388,6 +385,47 @@
       });
 
       window.addEventListener("load", () => overlay.classList.remove("active"));
+
+      // ✅ Confirm before deleting a file
+      document.querySelectorAll('form[action="/delete"]').forEach((form) => {
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const filename = form.querySelector('input[name="filename"]').value;
+
+          Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to delete "${filename}"?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            background: "#16213e",
+            color: "#fff",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              overlay.classList.add("active");
+              form.submit();
+            }
+          });
+        });
+      });
+
+      // ✅ Show success toast if redirected after deletion
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("deleted") === "true") {
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "File deleted successfully!",
+          showConfirmButton: false,
+          timer: 2000,
+          background: "#16213e",
+          color: "#fff",
+        });
+      }
     </script>
   </body>
 </html>

@@ -1,0 +1,93 @@
+[
+  {
+    "timestamp": "2025-11-04T00:00:46.895578",
+    "action": "delete",
+    "filename": "augmented_cluster_5_484.BMP",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-04T00:03:55.275734",
+    "action": "delete",
+    "filename": "augmented_cluster_5_95.BMP",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-04T00:06:00.787833",
+    "action": "delete",
+    "filename": "tanjiro-and-nezuko-kamado.3840x2160.mp4",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-04T00:06:05.995021",
+    "action": "delete",
+    "filename": "Sliding_Window_Protocols_Survey.docx",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-04T00:09:33.919985",
+    "action": "upload",
+    "filename": "fingerprint_1761758194.bmp",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-04T00:11:12.670783",
+    "action": "upload",
+    "filename": "Multiple_Access_Schemes_in_5G.docx",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-04T00:24:36.964409",
+    "action": "upload",
+    "filename": "topics.txt",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-07T22:11:36.260030",
+    "action": "upload",
+    "filename": "fee.pdf",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-08T16:28:50.488688",
+    "action": "delete",
+    "filename": "topics.txt",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-08T16:38:27.780780",
+    "action": "upload",
+    "filename": "download_18.pptx",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-08T16:39:19.867711",
+    "action": "delete",
+    "filename": "download_18.pptx",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-08T16:41:44.224653",
+    "action": "upload",
+    "filename": "free aptitude test psychometriq.com.pdf",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  },
+  {
+    "timestamp": "2025-11-08T16:42:03.197875",
+    "action": "delete",
+    "filename": "free aptitude test psychometriq.com.pdf",
+    "username": "sftpuser",
+    "host": "172.23.174.37"
+  }
+]
