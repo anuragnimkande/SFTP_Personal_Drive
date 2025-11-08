@@ -1,6 +1,6 @@
 import tempfile
 from flask import Blueprint, abort, render_template, request, send_file, flash, redirect, url_for, jsonify
-from utils.sftp_utils import get_sftp_connection, list_files
+from sftp_personal_drive.utils.sftp_utils import get_sftp_connection, list_files
 import os
 import io
 import json

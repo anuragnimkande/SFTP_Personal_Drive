@@ -1,5 +1,5 @@
 from flask import Flask
-from routes.main_routes import main_bp
+from sftp_personal_drive.routes.main_routes import main_bp
 import os
 
 app = Flask(__name__)
