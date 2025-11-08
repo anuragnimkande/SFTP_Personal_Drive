@@ -1,0 +1,24 @@
+# Web framework
+Flask==3.0.3
+
+# SFTP and SSH connection handling
+paramiko==3.4.0
+
+# Environment variable and configuration management (optional but recommended)
+python-dotenv==1.0.1
+
+# For working with file uploads and temporary storage
+Werkzeug==3.0.3
+
+# For Jinja2 templating (Flask dependency but listed for completeness)
+Jinja2==3.1.4
+
+# Utilities (date/time handling, JSON, etc.)
+itsdangerous==2.2.0
+MarkupSafe==3.0.2
+
+# Optional: if you’re using flash messages or forms
+Flask-WTF==1.2.1
+
+# Optional: if you plan to serve static files securely
+gunicorn==23.0.0
